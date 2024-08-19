@@ -1,14 +1,12 @@
-int pointsareequal
-(float *a, float *b);
+int find_path(float *result, float *start, float *end);
 
-int pointiswalkable
-(float *point);
+int point_is_walkable(float *point);
 
-float pointsdistance
-(float *a, float *b);
+int point_has_obstacle(float *point);
 
-int pointhasobstacle
-(float *point);
+int points_are_equal(float *a, float *b);
+
+float points_distance(float *a, float *b);
 
 // find path from start to end.
 // store the next step in result.
@@ -28,8 +26,7 @@ int pointhasobstacle
 // result can be NULL (useful if you only want to know if a path is possible)
 // on success, 1 is returned.
 // on failure, 0 is returned.
-int findpath
-(float *result, float *start, float *end)
+int find_path(float *result, float *start, float *end)
 {
     // this struct probably won't be used outside this function so
     // we may as well just define it in here and that's it.
@@ -45,29 +42,29 @@ int findpath
     static struct node nodes[8192] = {0};
     // prevent infinite loops.
     // default: 4096
-    int maxtries = 4096;
+    int max_tries = 4096;
     if (!start)
         return 0;
     if (!end)
         return 0;
     // add the start point to the open list.
-    int nodescount = 1;
+    int nodes_count = 1;
     nodes[0] = (struct node) {0};
     nodes[0].position[0] = start[0];
     nodes[0].position[1] = start[1];
-    for (int tries = 0; tries < maxtries; tries++) {
+    for (int tries = 0; tries < max_tries; tries++) {
         struct node *current = 0;
         // find non-visited node with lowest f.
-        for (int i = 0; i < nodescount; i++) {
+        for (int i = 0; i < nodes_count; i++) {
             if (nodes[i].visited)
                 continue;
             if (!current) {
                 current = nodes + i;
                 continue;
             }
-            float currentf = current->g + current->h;
-            float nodef = nodes[i].g + nodes[i].h;
-            if (nodef < currentf)
+            float current_f = current->g + current->h;
+            float node_f = nodes[i].g + nodes[i].h;
+            if (node_f < current_f)
                 current = nodes + i;
         }
         // nothing more to process. the path couldn't be found.
@@ -76,7 +73,7 @@ int findpath
         // mark the node as visited so we won't check it again.
         current->visited = 1;
         // found path!
-        if (pointsareequal(current->position, end)) {
+        if (points_are_equal(current->position, end)) {
             if (result) {
                 // find the next step from start.
                 while (current->parent) {
@@ -94,65 +91,76 @@ int findpath
         // cells close to the current node.
         float neighbor[][2] = {
             // left.
-            {current->position[0] - celld, current->position[1]},
+            { current->position[0] - celld, current->position[1] },
             // right.
-            {current->position[0] + celld, current->position[1]},
+            { current->position[0] + celld, current->position[1] },
             // up.
-            {current->position[0], current->position[1] - celld},
+            { current->position[0], current->position[1] - celld },
             // down.
-            {current->position[0], current->position[1] + celld},
+            { current->position[0], current->position[1] + celld },
         };
-        int neighborscount = 4;
-        for (int j = 0; j < neighborscount; j++) {
-            int alreadychecked = 0;
+        int neighbors_count = 4;
+        for (int j = 0; j < neighbors_count; j++) {
+            int already_checked = 0;
             // check if position already visited.
-            for (int k = nodescount - 1; k >= 0; k--) {
+            for (int k = nodes_count - 1; k >= 0; k--) {
                 if (nodes[k].position[0] == neighbor[j][0] &&
                     nodes[k].position[1] == neighbor[j][1] &&
                     nodes[k].visited) {
-                    alreadychecked = 1;
+                    already_checked = 1;
                     break;
                 }
             }
             // skip if already checked.
-            if (alreadychecked)
+            if (already_checked)
                 continue;
             // don't add neighbor if it's already in the list
             // and it has a lower g
-            int alreadyincludedwithlowerg = 0;
-            for (int k = nodescount - 1; k >= 0; k--) {
+            int already_included_with_lower_g = 0;
+            for (int k = nodes_count - 1; k >= 0; k--) {
                 if (nodes[k].position[0] == neighbor[j][0] &&
                     nodes[k].position[1] == neighbor[j][1] &&
                     !nodes[k].visited &&
                     nodes[k].g < current->g + celld) {
-                    alreadyincludedwithlowerg = 1;
+                    already_included_with_lower_g = 1;
                     break;
                 }
             }
-            if (alreadyincludedwithlowerg)
+            if (already_included_with_lower_g)
                 continue;
             // check if the cell can be walked.
-            if (!pointiswalkable(neighbor[j]))
+            if (!point_is_walkable(neighbor[j]))
                 continue;
             // check if there is an obstacle in the cell.
-            if (pointhasobstacle(neighbor[j]))
+            if (point_has_obstacle(neighbor[j]))
                 continue;
             // add neighbor.
-            nodes[nodescount] = (struct node) {0};
+            nodes[nodes_count] = (struct node) {0};
             // distance between child and parent.
-            nodes[nodescount].g = current->g + celld;
-            nodes[nodescount].h = pointsdistance(neighbor[j], end);
-            nodes[nodescount].position[0] = neighbor[j][0];
-            nodes[nodescount].position[1] = neighbor[j][1];
-            nodes[nodescount].parent = current;
-            nodescount++;
+            nodes[nodes_count].g = current->g + celld;
+            nodes[nodes_count].h = points_distance(neighbor[j], end);
+            nodes[nodes_count].position[0] = neighbor[j][0];
+            nodes[nodes_count].position[1] = neighbor[j][1];
+            nodes[nodes_count].parent = current;
+            nodes_count++;
         }
     }
     return 0;
 }
 
-int pointsareequal
-(float *a, float *b)
+int point_is_walkable(float *point)
+{
+    // write your implementation.
+    return 1;
+}
+
+int point_has_obstacle(float *point)
+{
+    // write your implementation.
+    return 0;
+}
+
+int points_are_equal(float *a, float *b)
 {
     // write your implementation.
     // this is just an example.
@@ -163,31 +171,10 @@ int pointsareequal
     return result;
 }
 
-int pointiswalkable
-(float *point)
+float points_distance(float *a, float *b)
 {
-    // write your implementation.
-    return 1;
-}
-
-float pointsdistance
-(float *a, float *b)
-{
-    if (!a)
-        return 0;
-    if (!b)
-        return 0;
     float dx = b[0] - a[0];
     float dy = b[1] - a[1];
     float result = dx * dx + dy * dy;
-    // optional.
-    // result = sqrtf(result);
     return result;
-}
-
-int pointhasobstacle
-(float *point)
-{
-    // write your implementation.
-    return 0;
 }

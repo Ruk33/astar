@@ -1,4 +1,4 @@
-astar / pathfinding
+astar / path finding
     this is a very simple path finding function. from two points, it will
     calculate the next step to walk that's closer to the end goal.
 
@@ -8,18 +8,18 @@ astar / pathfinding
 
 how to use it?
     first, make sure you implement the functions:
-    - pointsareequal: checks if two points are equal.
-    - pointiswalkable: checks if a point is walkable (ie, is terrain?)
-    - pointhasobstacle: checks if a point, even if walkable, contains
+    - points_are_equal: checks if two points are equal.
+    - point_is_walkable: checks if a point is walkable (ie, is terrain?)
+    - point_has_obstacle: checks if a point, even if walkable, contains
     an obstacle (ie, another unit, a wall, etc.)
     
-    after that, the function findpath can be called to get/calculate
+    after that, the function find_path can be called to get/calculate
     the next step from start to end.
     
     this is, imagine you have the following map/grid:
     [s][x][x][x][x][x][x][e]
     
-    where s = start and e = end. upon calling findpath, the result
+    where s = start and e = end. upon calling find_path, the result
     would be (r):
     [s][r][x][x][x][x][x][e]
     
@@ -30,7 +30,7 @@ how to use it?
     would result in:
     [x][s][r][x][x][x][x][e]
 
-    findpath will return 1 if the path is possible, or 0 if not.
+    find_path will return 1 if the path is possible, or 0 if not.
 
 license
     whatever, mit?
